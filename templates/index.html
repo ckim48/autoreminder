@@ -8,428 +8,479 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar/main.min.css" rel="stylesheet">
     <link rel="icon" href="../static/img/favicon.png" type="image/x-icon"> <!-- Favicon -->
     <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png"> <!-- Apple Touch Icon -->
-  <style>
-    body {
-        background-color: #f3f4f6;
-        font-family: 'Roboto', sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-    }
+<style>
+/* Modern color palette */
+:root {
+    --primary-color: #4f46e5; /* Vibrant indigo */
+    --primary-hover-color: #4338ca; /* Deeper indigo for hover */
+    --secondary-color: #f3f4f6; /* Light gray for a clean background */
+    --accent-color: #22c55e; /* Vibrant green for accents */
+    --text-color: #1f2937; /* Dark gray for better readability */
+}
 
-    .container {
-        width: 90%;
-        max-width: 900px;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        margin-top: 20px;
-        padding: 20px;
-    }
 
-    .tabs {
-        display: flex;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: 20px;
-    }
+/* General body styling */
+body {
+    background-color: var(--secondary-color);
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    color: var(--text-color);
+}
 
-    .tabs button {
-        flex: 1;
-        padding: 15px 20px;
-        font-size: 1rem;
-        font-weight: 500;
-        background: none;
-        border: none;
-        border-bottom: 3px solid transparent;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
+.container {
+    width: 90%;
+    max-width: 900px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 20px;
+    padding: 20px;
+}
 
-    .tabs button.active {
-        border-bottom: 3px solid #007bff;
-        color: #007bff;
-    }
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
 
-    .tab-content {
-        display: none;
-    }
+.tabs button {
+    flex: 1;
+    padding: 15px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s;
+}
 
-    .tab-content.active {
-        display: block;
-    }
+.tabs button.active {
+    border-bottom: 3px solid var(--primary-color);
+    color: var(--primary-color);
+}
 
-    .chat {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+.tab-content {
+    display: none;
+}
 
-    .chat-messages {
-        height: 300px;
-        overflow-y: auto;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background: #f9f9f9;
-    }
+.tab-content.active {
+    display: block;
+}
 
-    .chat-input {
-        display: flex;
-        gap: 10px;
-    }
+.task-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
-    .chat-input input {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-    }
-
-    .chat-input button {
-        padding: 10px 20px;
-        background: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-
-    .chat-input button:hover {
-        background: #0056b3;
-    }
-
-    .task-input {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    .task-input input,
-    .task-input button {
-        padding: 10px;
-        font-size: 1rem;
-        border-radius: 8px;
-        flex: 1;
-    }
-
-    .task-input button {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .task-input button:hover {
-        background-color: #0056b3;
-    }
-
-    #calendar-container {
-        margin-top: 20px;
-    }
-
-    #calendar {
-        background: #ffffff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-        padding: 15px;
-    }
-
-    .fc-toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .fc-button {
-        background-color: #007bff;
-        border: none;
-        color: white;
-        padding: 8px 15px;
-        font-size: 0.9rem;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-    }
-
-    .fc-button:hover {
-        background-color: #0056b3;
-    }
-
-    .fc-today {
-        background-color: rgba(0, 123, 255, 0.1);
-        border: 1px solid #007bff;
-    }
-
-    .fc-daygrid-day {
-        font-size: 0.9rem;
-        text-align: center;
-    }
-
-    .fc-daygrid-event {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 0.8rem;
-        padding: 2px 5px;
-    }
-
-    .fc .fc-col-header-cell-cushion {
-        text-decoration: none;
-        color: black;
-    }
-
-    .fc .fc-daygrid-day-number {
-        text-decoration: none;
-        color: black;
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .tabs {
-            flex-direction: column;
-            border-bottom: none;
-        }
-
-        .tabs button {
-            border-bottom: 1px solid #ddd;
-            padding: 10px;
-            font-size: 0.9rem;
-        }
-
-        .chat-messages {
-            height: 200px;
-            padding: 10px;
-            font-size: 0.9rem;
-        }
-
-        .chat-input input {
-            padding: 8px;
-        }
-
-        .chat-input button {
-            padding: 8px 15px;
-        }
-
-        .task-input {
-            flex-direction: column;
-        }
-
-        .task-input input,
-        .task-input button {
-            flex: none;
-            width: 100%;
-        }
-
-        #calendar {
-            padding: 10px;
-            font-size: 0.8rem;
-        }
-
-        .fc-button {
-            padding: 6px 10px;
-            font-size: 0.8rem;
-        }
-    }
-      input[type="date"],
-input[type="time"] {
-    background-color: #fff; /* Ensures a white background */
-    border: 1px solid #ddd; /* Adds a visible border */
-    border-radius: 8px; /* Matches other inputs' styling */
+.task-input input,
+.task-input button {
     padding: 10px;
     font-size: 1rem;
-    color: #333; /* Ensures text is visible */
+    border-radius: 8px;
+    flex: 1;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-    filter: none; /* Fixes icon visibility */
-    opacity: 1; /* Ensures the picker indicator is visible */
+.task-input button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-@media (max-width: 768px) {
-    input[type="date"],
-    input[type="time"] {
-        padding: 8px;
-        font-size: 0.9rem; /* Adjust size for smaller screens */
-    }
+.task-input button:hover {
+    background-color: var(--primary-hover-color);
 }
 
+#calendar-container {
+    margin-top: 20px;
+    max-width: 80%; /* Restrict the calendar width */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#calendar {
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+}
+
+/* Remove underline from dates and days */
+.fc-daygrid-day-number {
+    text-decoration: none !important;
+    color: inherit;
+}
+
+.fc-toolbar-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.fc-toolbar button {
+    text-transform: capitalize;
+}
+
+.fc-button {
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.fc-button:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.fc-col-header-cell-cushion {
+    color: black;
+    text-decoration: none;
+}
+
+/* Chat Section Styles */
+.chat {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-messages {
+    height: 300px;
+    overflow-y: auto;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-bubble {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    margin: 5px 0;
+    display: inline-block;
+    position: relative;
+}
+
+/* User Chat Bubble - Align Left */
+.chat-bubble.user {
+    background: var(--primary-color);
+    color: #fff;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 15px;
+    text-align: left;
+}
+
+/* Bot Chat Bubble - Align Right */
+.chat-bubble.bot {
+    background: #f1f1f1;
+    color: var(--text-color);
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+    border-top-left-radius: 15px;
+    text-align: right;
+}
+
+/* Adjust padding and bubble width */
+.chat-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Arrow for user chat bubble */
+.chat-bubble.user::after {
+    left: -8px;
+    border-style: solid;
+    border-width: 8px 8px 0 0;
+    border-color: var(--primary-color) transparent transparent transparent;
+}
+
+/* Arrow for bot chat bubble */
+.chat-bubble.bot::after {
+    right: -8px;
+    border-style: solid;
+    border-width: 8px 0 0 8px;
+    border-color: #f1f1f1 transparent transparent transparent;
+}
+
+.chat-input {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.chat-input button {
+    padding: 10px 20px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.chat-input button:hover {
+    background: var(--primary-hover-color);
+}
+
+.app-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.app-header p {
+    font-size: 1rem;
+    margin-top: 10px;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+    .fc-event-past{
+/*    background-color: #e0e0e0 !important; *//* Light gray background */
+    border-color: #b0b0b0 !important; /* Slightly darker border */
+    color: #505050 !important; /* Medium gray text for readability */
+    opacity: 0.9 !important; /* Less transparency for better visibility */
+}
+.fc-event {
+    white-space: nowrap !important; /* Prevent wrapping */
+    overflow: hidden !important; /* Hide overflowing text */
+    text-overflow: ellipsis !important; /* Add ellipsis to overflowing text */
+    padding: 5px; /* Add padding for better readability */
+    font-size: 0.9rem; /* Adjust font size for better fit */
+    line-height: 1.2; /* Line height for consistent layout */
+}
+    .fc-event-title {
+    white-space: nowrap; /* Prevents text from wrapping to the next line */
+    overflow: hidden; /* Hides the overflowing text */
+    text-overflow: ellipsis; /* Adds an ellipsis (...) to indicate truncated text */
+}
 </style>
 
 </head>
 <body>
-        {% include 'header.html' %}
-
+    {% include 'header.html' %}
+<div class="app-header">
+    <h1 class="text-center my-4">Reminder App with Chat</h1>
+    <p class="text-center text-muted">
+        Welcome to your personalized reminder app. Use the "Tasks" tab to schedule your tasks and set reminders, or switch to the "Chat" tab to interact with the chatbot for assistance or suggestions.
+    </p>
+</div>
     <div class="container">
         <div class="tabs">
-                        <button class="active" data-tab="tasks">Tasks</button>
-
+            <button class="active" data-tab="tasks">Tasks</button>
             <button data-tab="chat">Chat</button>
+        </div>
+
+        <!-- Task Section -->
+        <div class="tab-content active" id="tasks">
+            <div class="task-input">
+                <input type="text" id="task-name" placeholder="Task name">
+                <input type="date" id="task-date">
+                <input type="time" id="task-time">
+                <input type="number" id="notification-time" placeholder="Notification (minutes before)">
+                <button id="add-task-btn">Add Task</button>
+            </div>
+            <div id="calendar-container">
+                <div id="calendar"></div>
+            </div>
         </div>
 
         <!-- Chat Section -->
         <div class="tab-content" id="chat">
             <div class="chat">
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Chat messages will appear here -->
-                </div>
+                <div class="chat-messages" id="chat-messages"></div>
                 <div class="chat-input">
                     <input type="text" id="chat-input" placeholder="Type your message here...">
                     <button id="send-btn">Send</button>
                 </div>
             </div>
         </div>
-
-        <!-- Task Management Section -->
-        <div class="tab-content  active" id="tasks">
-<div class="task-input">
-    <input type="text" id="task-name" placeholder="Task name">
-    <input type="date" id="task-date">
-    <input type="time" id="task-time"> <!-- Task Time Input -->
-    <input type="number" id="notification-time" placeholder="Notification (minutes before)"> <!-- Notification Time Input -->
-    <button id="add-task-btn">Add Task</button>
-</div>
-
-            <div id="calendar-container">
-                <div id="calendar"></div>
-            </div>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar/main.min.js"></script>
     <script>
+   const calendarEl = document.getElementById('calendar'); // Declare globally for accessibility
+let calendar; // Declare the calendar variable globally
 document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.tabs button');
-    const contents = document.querySelectorAll('.tab-content');
-    const chatMessagesEl = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    const sendBtn = document.getElementById('send-btn');
-    const taskNameInput = document.getElementById('task-name');
-    const taskDateInput = document.getElementById('task-date');
-    const taskTimeInput = document.getElementById('task-time'); // Task Time input
-    const notificationTimeInput = document.getElementById('notification-time'); // Notification Time input
-    const addTaskBtn = document.getElementById('add-task-btn');
-    const tasks = [];
+    const calendarEl = document.getElementById('calendar');
+    let calendar;
+
+    // Initialize FullCalendar
+    function initializeCalendar() {
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay',
+            },
+            events: async function (fetchInfo, successCallback, failureCallback) {
+                try {
+                    const response = await fetch('/tasks'); // Fetch tasks from your server
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const events = result.events.map(event => {
+                            const eventDate = new Date(event.start); // Task start date
+                            const currentDate = new Date(); // Today's date
+
+                            // Check if the event is in the past (before today)
+                            if (eventDate < currentDate && eventDate.toDateString() !== currentDate.toDateString()) {
+                                event.classNames = ['past-task']; // Add class for past tasks
+                            }
+                            return event;
+                        });
+
+                        successCallback(events);
+                    } else {
+                        failureCallback('Error fetching tasks');
+                    }
+                } catch (error) {
+                    failureCallback('Error fetching tasks');
+                }
+            },
+            eventDidMount: function (info) {
+                // Add the Bootstrap tooltip
+                const tooltip = new bootstrap.Tooltip(info.el, {
+                    title: info.event.title, // Use the event title as the tooltip content
+                    placement: 'top', // Position the tooltip above the element
+                    trigger: 'hover', // Show the tooltip on hover
+                });
+            },
+        });
+
+        calendar.render();
+    }
+
+    initializeCalendar();
 
     // Tabs functionality
+    const tabs = document.querySelectorAll('.tabs button');
+    const contents = document.querySelectorAll('.tab-content');
+
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             tabs.forEach(t => t.classList.remove('active'));
             contents.forEach(c => c.classList.remove('active'));
 
             tab.classList.add('active');
-            const activeContent = document.getElementById(tab.dataset.tab);
-            activeContent.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
 
-            // Fix FullCalendar rendering issue
+            // Refresh tasks when "Tasks" tab is clicked
             if (tab.dataset.tab === 'tasks') {
-                setTimeout(() => calendar.updateSize(), 0); // Ensure the calendar resizes properly
+                calendar.refetchEvents();
             }
         });
     });
 
     // Chat functionality
-    sendBtn.addEventListener('click', async () => {
-        const message = chatInput.value.trim();
-        if (message) {
-            // Append user message to the chat
-            const messageEl = document.createElement('div');
-            messageEl.textContent = `You: ${message}`;
-            chatMessagesEl.appendChild(messageEl);
+    const chatMessagesEl = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
 
-            // Call ChatGPT API
+    function addChatBubble(message, type) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${type}`;
+        bubble.textContent = message;
+        chatMessagesEl.appendChild(bubble);
+        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addChatBubble(message, 'user');
+        chatInput.value = '';
+
+        try {
             const response = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ message }),
             });
             const data = await response.json();
+            addChatBubble(data.reply || 'Error fetching reply', 'bot');
 
-            // Append ChatGPT reply to the chat
-            const replyEl = document.createElement('div');
-            replyEl.textContent = `Reminder AI: ${data.reply}`;
-            chatMessagesEl.appendChild(replyEl);
-
-            // Clear input and scroll to the bottom
-            chatInput.value = '';
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-        }
-    });
-
-    // FullCalendar setup
-    const calendarEl = document.getElementById('calendar');
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay',
-        },
-        events: [],
-    });
-    calendar.render();
-
-    // Request Notification Permission
-    if ('Notification' in window) {
-        Notification.requestPermission().then(permission => {
-            if (permission !== 'granted') {
-                alert('Please enable notifications for reminders to work.');
+            if (data.new_task_added) {
+                // Notify the user and refresh the calendar
+//                alert('A new task has been added!');
+                calendar.refetchEvents();
             }
-        });
-    }
-
-    // Schedule Notifications
-    function scheduleNotification(taskName, taskDate, taskTime, notificationTime) {
-        // Calculate notification time
-        const taskDateTime = new Date(`${taskDate}T${taskTime}`);
-        const notificationDateTime = new Date(taskDateTime.getTime() - notificationTime * 60000);
-
-        const now = new Date();
-        const delay = notificationDateTime - now;
-
-        if (delay > 0) {
-            setTimeout(() => {
-                new Notification("Task Reminder", {
-                    body: `Reminder: ${taskName} is scheduled at ${taskTime} on ${taskDate}.`,
-                });
-            }, delay);
+        } catch {
+            addChatBubble('Error sending message.', 'bot');
         }
     }
 
-    // Add Task Functionality
-    addTaskBtn.addEventListener('click', () => {
-        const taskName = taskNameInput.value.trim();
-        const taskDate = taskDateInput.value;
-        const taskTime = taskTimeInput.value;
-        const notificationTime = parseInt(notificationTimeInput.value, 10); // Notification time in minutes
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendMessage();
+    });
 
-        if (taskName && taskDate && taskTime && !isNaN(notificationTime)) {
-            // Add task to the calendar
-            const task = { title: taskName, start: `${taskDate}T${taskTime}` };
-            tasks.push(task);
-            calendar.addEvent(task);
+    // Event listener for Add Task button
+    document.getElementById('add-task-btn').addEventListener('click', async function () {
+        const taskName = document.getElementById('task-name').value.trim();
+        const taskDate = document.getElementById('task-date').value;
+        const taskTime = document.getElementById('task-time').value;
 
-            // Schedule notification
-            scheduleNotification(taskName, taskDate, taskTime, notificationTime);
+        if (!taskName || !taskDate || !taskTime) {
+            alert('Please fill out all fields.');
+            return;
+        }
 
-            alert('Task added and notification scheduled!');
-            // Clear input fields
-            taskNameInput.value = '';
-            taskDateInput.value = '';
-            taskTimeInput.value = '';
-            notificationTimeInput.value = '';
-        } else {
-            alert('Please fill in all fields, including notification time.');
+        try {
+            const response = await fetch('/add-task', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    task: taskName,
+                    date: taskDate,
+                    time: taskTime,
+                }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert('Task added successfully!');
+                document.getElementById('task-name').value = '';
+                document.getElementById('task-date').value = '';
+                document.getElementById('task-time').value = '';
+
+                // Refresh the calendar with updated tasks
+                calendar.refetchEvents();
+            } else {
+                alert('Error adding task: ' + result.error);
+            }
+        } catch (error) {
+            alert('An error occurred while adding the task.');
         }
     });
 });
