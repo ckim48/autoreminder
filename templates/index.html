@@ -240,6 +240,30 @@
             font-size: 0.8rem;
         }
     }
+      input[type="date"],
+input[type="time"] {
+    background-color: #fff; /* Ensures a white background */
+    border: 1px solid #ddd; /* Adds a visible border */
+    border-radius: 8px; /* Matches other inputs' styling */
+    padding: 10px;
+    font-size: 1rem;
+    color: #333; /* Ensures text is visible */
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: none; /* Fixes icon visibility */
+    opacity: 1; /* Ensures the picker indicator is visible */
+}
+
+@media (max-width: 768px) {
+    input[type="date"],
+    input[type="time"] {
+        padding: 8px;
+        font-size: 0.9rem; /* Adjust size for smaller screens */
+    }
+}
+
 </style>
 
 </head>

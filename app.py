@@ -1,12 +1,14 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import sqlite3
 import json
 from pywebpush import webpush, WebPushException
 from datetime import datetime, timedelta
 import threading
 import time
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Replace with a secure secret key
 
 # Replace with your VAPID keys
 VAPID_PUBLIC_KEY = "BCon0VtA1b72sjtj45d8s-1mmdeg_NSmb8MpGN7vfAMbTWa1fWGWePbn7obBFGDZidVUGz4jWbIvmEwJ9VHMbJ0"
@@ -19,6 +21,13 @@ def init_db():
     """Initialize SQLite database."""
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        )
+    ''')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,11 +51,63 @@ def init_db():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return render_template('index.html', username=session['username'])
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        try:
+            # Hash the password before storing it
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            return "Username already exists", 400
+        finally:
+            conn.close()
+
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+        user = cursor.fetchone()
+        conn.close()
+
+        if user and check_password_hash(user[2], password):  # Validate hashed password
+            session['username'] = username
+            return redirect(url_for('index'))
+        else:
+            return "Invalid username or password", 401
+    return render_template('login.html')
+
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('login'))
 
 
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
+    if 'username' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
     subscription = request.json
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
